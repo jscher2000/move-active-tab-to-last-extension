@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "Move Active Tab to Last",
 	"description": "Move a tab to the last position of the tab bar when activated, assuming it is not a pinned tab.",
-	"version": "0.1",
+	"version": "0.2",
 	"applications":{
 		"gecko": {
 			"strict_min_version": "57.0"
@@ -10,7 +10,7 @@
 	},
 	"developer": {
 		"name": "Jefferson \"jscher2000\" Scher",
-		"url": "https://github.com/jscher2000/"
+		"url": "https://github.com/jscher2000/move-active-tab-to-last-extension"
 	},
 	"background": {
 		"scripts": [
