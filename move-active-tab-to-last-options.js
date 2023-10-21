@@ -3,13 +3,15 @@
   Copyright 2023. Jefferson "jscher2000" Scher. License: MPL-2.0.
   Script to apply defaults and save changes on the Options page
   Revision 0.4 - Tab move delay
+  Revision 0.5 - Option to set to first tab instead of last
 */
 
 /*** Initialize Page ***/
 
 // Default starting values
 var oSettings = {
-	delaySeconds: 0				// seconds to wait before moving the active tab
+	delaySeconds: 0,			// seconds to wait before moving the active tab
+	tabPos: -1					// new tabIndex which determines position on the bar
 }
 
 var frmOptions = document.getElementById('frmOptions');
@@ -27,6 +29,8 @@ browser.storage.local.get("prefs").then( (results) => {
 }).then(() => {
 	// Delay time
 	frmOptions.elements['numSeconds'].value = oSettings.delaySeconds;
+	// Tab position
+	frmOptions.elements['radPos'].value = oSettings.tabPos;
 	// Attach event handler to the Save buttons
 	frmOptions.addEventListener('click', updatePref, false);
 	frmOptions.addEventListener('change', lightSaveBtn, false);
@@ -39,15 +43,16 @@ browser.storage.local.get("prefs").then( (results) => {
 // Update storage
 function updatePref(evt){
 	if (evt.target.className != 'savebtn') return;
-	// Delay time
 	var frm = evt.target.closest('form');
+	// Delay time
 	if (frm.elements['numSeconds'].valueAsNumber >= 0 && frm.elements['numSeconds'].valueAsNumber <= 30){
 		oSettings.delaySeconds = frm.elements['numSeconds'].valueAsNumber;
 	} else {
 		alert('Delay time is not within the 0 to 30 second range? [' + frm.elements['numSeconds'].valueAsNumber + ']');
 		return false;
 	}
-
+	// Tab position
+	oSettings.tabPos = parseInt(frm.elements['radPos'].value);
 	// Update storage
 	browser.storage.local.set(
 		{prefs: oSettings}
@@ -83,6 +88,26 @@ function lightSaveBtn(evt){
 						evt.target.labels[0].classList.remove('changed');
 					}
 					break;
+			}
+			break;
+		case 'radio':
+			switch (evt.target.name){
+				case 'radPos':
+					if (evt.target.value != oSettings.tabPos) chgd = true;
+					else chgd = false;
+					break;
+			}
+			if (chgd == true){
+				var rads = frm.querySelectorAll('input[name="' + evt.target.name + '"]');
+				for (var i=0; i<rads.length; i++){
+					if (rads[i].getAttribute('value') == evt.target.getAttribute('value')) rads[i].labels[0].className = 'changed';
+					else rads[i].labels[0].className = '';
+				}
+			} else {
+				var rads = frm.querySelectorAll('input[name="' + evt.target.name + '"]');
+				for (var i=0; i<rads.length; i++){
+					rads[i].labels[0].className = '';
+				}
 			}
 			break;
 		default:
